@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Tengwar Annatar';
+    src: url('../static/fonts/TengwarAnnatar-RpaW.ttf') format('truetype');
+}
+  
+.tengwar {
+font-family: Tengwar Annatar, sans-serif;
+font-size: 24px;
+}
