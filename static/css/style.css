@@ -1,16 +1,16 @@
 @font-face {
     font-family: 'Tengwar Annatar';
-    src: url('fonts/TengwarAnnatar-RpaW.ttf') format('truetype');
+    src: url('../fonts/TengwarAnnatar-RpaW.ttf') format('truetype');
 }
   
 .tengwar {
-font-family: TengwarAnnatar, sans-serif;
+font-family: "Tengwar Annatar", sans-serif;
 font-size: 24px;
 }
 
 /* set the font for the entire page */
 body {
-    font-family: "Tengwar Annatar", sans-serif;
+    font-family: Georgia, serif;
 }
 
 /* style the header */
