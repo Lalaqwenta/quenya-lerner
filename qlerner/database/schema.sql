@@ -7,6 +7,7 @@ CREATE TABLE users (
   id INTEGER PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
   email TEXT UNIQUE NOT NULL,
+  remember_token TEXT,
   password TEXT NOT NULL
 );
 

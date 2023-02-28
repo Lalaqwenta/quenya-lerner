@@ -9,9 +9,8 @@
             <ul>
                 <li><a href="{{ url_for('routes.home') }}">Home</a></li>
                 {% if current_user.is_authenticated %}
-                    <li><a href="{{ url_for('routes.home') }}">Home2</a></li>
-                    <!-- <li><a href="{{ url_for('routes.profile') }}">Profile</a></li>
-                    <li><a href="{{ url_for('routes.logout') }}">Logout</a></li> -->
+                    <li><a href="{{ url_for('routes.profile') }}">Profile</a></li>
+                    <li><a href="{{ url_for('routes.logout') }}">Logout</a></li> 
                 {% else %}
                     <li><a href="{{ url_for('routes.signup') }}">Sign up</a></li>
                     <li><a href="{{ url_for('routes.login') }}">Log in</a></li>

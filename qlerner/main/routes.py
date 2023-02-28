@@ -5,6 +5,7 @@ from qlerner.models.user import User
 from qlerner.models.exercise import Exercise
 from qlerner.models.word import Word
 from qlerner.forms.login import LoginForm
+from qlerner.forms.signin import SignIn
 from qlerner.main.database import db
 
 routes = Blueprint('routes', __name__)
@@ -31,8 +32,8 @@ def signup():
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
             return render_template('signup.html', error='Email already exists')
-
         new_user = User(username=username, password=password, email=email)
+        
         db.session.add(new_user)
         db.session.commit()
 
@@ -55,3 +56,12 @@ def login():
             flash('Invalid email or password', 'danger')
 
     return render_template('login.html', form=form)
+
+@routes.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('routes.login'))
+
+@routes.route('/profile')
+def profile():
+    return "Nothing here"
