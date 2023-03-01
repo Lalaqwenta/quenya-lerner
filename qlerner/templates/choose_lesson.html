@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Choose a Lesson</h1>
+  <div class="list-group">
+    {% for lesson in lessons %}
+      <a href="{{ url_for('routes.solve_lesson', lesson_id=lesson.id) }}" class="list-group-item">{{ lesson.title }}</a>
+    {% endfor %}
+  </div>
+{% endblock %}

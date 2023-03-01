@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1 class="mb-4">Solve Exercise</h1>
+  <form method="POST" action="{{ url_for('routes.solve_lesson', lesson_id=lesson.id, current_index=current_index) }}">
+    <h2>{{ exercise.question }}</h2>
+    <label for="answer">Your Answer:</label>
+    <input type="text" name="answer" id="answer" required>
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}
