@@ -10,14 +10,9 @@ class Exercise(db.Model):
     answer = db.Column(db.Text, nullable=False)
     hint = db.Column(db.String(100))
     tags = db.Column(db.String)  # comma-separated list of tags
-    lessons = db.relationship('Lesson', secondary='exercises_for_lesson')
-    users = db.relationship('User', secondary='user_completed_exercises', back_populates='completed_exercises')
 
-class UserCompletedExercise(db.Model):
-    __tablename__ = 'user_completed_exercises'
-
-    user_id = db.Column(db.Integer, ForeignKey('users.id'), primary_key=True)
-    exercise_id = db.Column(db.Integer, ForeignKey('exercises.id'), primary_key=True)
-
-    user = relationship('User', back_populates='completed_exercises')
-    exercise = relationship('Exercise', back_populates='users')
+completed_exercises_NAMETAG = 'completed_exercises'
+completed_exercises = db.Table(completed_exercises_NAMETAG,
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('exercise_id', db.Integer, db.ForeignKey('exercises.id'))
+)
