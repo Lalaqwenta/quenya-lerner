@@ -3,6 +3,9 @@ DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS words;
 DROP TABLE IF EXISTS lessons;
 DROP TABLE IF EXISTS lesson_tags;
+DROP TABLE IF EXISTS exercise_tags;
+DROP TABLE IF EXISTS user_completed_exercises;
+DROP TABLE IF EXISTS user_completed_lessons;
 
 CREATE TABLE users (
   id INTEGER PRIMARY KEY,
@@ -16,7 +19,8 @@ CREATE TABLE exercises (
   id INTEGER PRIMARY KEY,
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
-  hint TEXT
+  hint TEXT,
+  tags TEXT
 );
 
 CREATE TABLE words (
@@ -30,6 +34,7 @@ CREATE TABLE words (
 CREATE TABLE lessons (
   id INTEGER PRIMARY KEY,
   title TEXT NOT NULL,
+  tags TEXT,
   exercise_ids TEXT NOT NULL,
   FOREIGN KEY (exercise_ids) REFERENCES exercises (id)
 );

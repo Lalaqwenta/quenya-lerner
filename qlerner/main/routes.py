@@ -1,13 +1,14 @@
 from flask import Blueprint, request, flash, redirect, url_for
 from flask import render_template
 from flask_login import login_user, current_user, logout_user, login_required
-from qlerner.models.user import User
-from qlerner.models.exercise import Exercise
-from qlerner.models.lesson import Lesson
-from qlerner.models.word import Word
+from qlerner.models.user import *
+from qlerner.models.exercise import *
+from qlerner.models.lesson import *
+from qlerner.models.word import *
 from qlerner.forms.login import LoginForm
 from qlerner.forms.signin import SignIn
 from qlerner.main.database import db
+from sqlalchemy import text
 
 routes = Blueprint('routes', __name__)
 
@@ -67,14 +68,17 @@ def logout():
 @login_required
 def profile():
     user = current_user
-    solved_exercises = sum([exercise.is_solved for exercise in user.exercises])
-    return render_template('profile.html', user=user, solved_exercises=solved_exercises)
+    query = text("SELECT * FROM {table} WHERE user_id = '{user_id}'".format(
+        table=user_completed_lessons_NAMETAG, user_id=user.id
+    ))
+    solved_lessons = len(db.engine.connect().execute(query).fetchall())
+    return render_template('profile.html', user=user, solved_lessons=solved_lessons)
 
 @routes.route('/choose_lesson', methods=['GET'])
 @login_required
 def choose_lesson():
-    lesson = Lesson.query.all()
-    return render_template('choose_lesson.html', lesson=lesson)
+    lessons = Lesson.query.all()
+    return render_template('choose_lesson.html', lessons=lessons)
 
 @routes.route('/solve_lesson/<int:lesson_id>', methods=['GET', 'POST'])
 @login_required

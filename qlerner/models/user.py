@@ -8,8 +8,6 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
-    completed_lessons = db.relationship('Lesson', secondary='user_completed_lessons')
-    exercises = db.relationship('Exercise', secondary='user_completed_exercises')
     remember_token = db.Column(db.String(128), nullable=False, default='')
 
     def check_password(self, _password: str) -> bool:
