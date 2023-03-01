@@ -9,6 +9,7 @@ from qlerner.forms.login import LoginForm
 from qlerner.forms.signin import SignIn
 from qlerner.main.database import db
 from sqlalchemy import text
+from datetime import datetime
 
 routes = Blueprint('routes', __name__)
 
@@ -68,6 +69,7 @@ def logout():
 @login_required
 def profile():
     user = current_user
+    
     query = text("SELECT * FROM {table} WHERE user_id = '{user_id}'".format(
         table=user_completed_lessons_NAMETAG, user_id=user.id
     ))
@@ -83,15 +85,46 @@ def choose_lesson():
 @routes.route('/solve_lesson/<int:lesson_id>', methods=['GET', 'POST'])
 @login_required
 def solve_lesson(lesson_id):
-    exercise = Exercise.query.get(lesson_id)
-    form = LessonForm()
-    if form.validate_on_submit():
-        if form.answer.data == exercise.answer:
-            # update user's solved exercises
-            current_user.solved_exercises.append(exercise)
+    lesson = Lesson.query.get_or_404(lesson_id)
+    exercise_ids = lesson.exercise_ids.split(',')
+    current_index = int(request.args.get('current_index', 0))
+    current_exercise_id = int(exercise_ids[current_index])
+    current_exercise = Exercise.query.get(current_exercise_id)
+
+    if request.method == 'POST':
+        # Check if answer is correct
+        user_answer = request.form['answer']
+        if user_answer.strip().lower() == current_exercise.answer.lower():
+            # Update completed exercises for user
+            user_completed_exercise = UserCompletedExercise.query.filter_by(user_id=current_user.id, exercise_id=current_exercise.id).first()
+            if user_completed_exercise:
+                user_completed_exercise.times_completed += 1
+            else:
+                user_completed_exercise = UserCompletedExercise(user_id=current_user.id, exercise_id=current_exercise.id, times_completed = 1)
+                db.session.add(user_completed_exercise)
             db.session.commit()
-            flash('Congratulations! You solved the exercise!', 'success')
-            return redirect(url_for('routes.choose_exercise'))
+
+            # Move on to next exercise or complete lesson
+            if current_index == len(exercise_ids) - 1:
+                # Mark lesson as completed
+                user_completed_lesson = UserCompletedLesson.query.filter_by(user_id=current_user.id, lesson_id=lesson.id).first()
+                if user_completed_lesson:
+                    user_completed_lesson.times_completed += 1
+                    # user_completed_lesson.completed_at = datetime.now()
+                else:
+                    user_completed_lesson = UserCompletedLesson(user_id=current_user.id, lesson_id=lesson.id, times_completed = 1)
+                    db.session.add(user_completed_lesson)
+                db.session.commit()
+
+                flash('Congratulations, you have completed the lesson!', 'success')
+                return redirect(url_for('routes.choose_lesson'))
+
+            next_index = current_index + 1
+            next_exercise_id = int(exercise_ids[next_index])
+            next_exercise = Exercise.query.get(next_exercise_id)
+            return render_template('solve_lesson.html', lesson=lesson, exercise=next_exercise, current_index=next_index)
+
         else:
-            flash('Incorrect answer. Please try again.', 'danger')
-    return render_template('solve_exercise.html', form=form, exercise=exercise)
+            flash('Incorrect answer, please try again', 'danger')
+    
+    return render_template('solve_lesson.html', lesson=lesson, exercise=current_exercise, current_index=current_index)
