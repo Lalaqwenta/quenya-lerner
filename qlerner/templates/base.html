@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
 </head>
 <body>
     <header>
@@ -10,6 +11,7 @@
                 <li><a href="{{ url_for('routes.home') }}">Home</a></li>
                 {% if current_user.is_authenticated %}
                     <li><a href="{{ url_for('routes.profile') }}">Profile</a></li>
+                    <li><a href="{{ url_for('routes.choose_lesson') }}">Choose exercise</a></li>
                     <li><a href="{{ url_for('routes.logout') }}">Logout</a></li> 
                 {% else %}
                     <li><a href="{{ url_for('routes.signup') }}">Sign up</a></li>
