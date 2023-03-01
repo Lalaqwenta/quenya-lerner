@@ -1,8 +1,9 @@
 from flask import Blueprint, request, flash, redirect, url_for
 from flask import render_template
-from flask_login import login_user, current_user, logout_user
+from flask_login import login_user, current_user, logout_user, login_required
 from qlerner.models.user import User
 from qlerner.models.exercise import Exercise
+from qlerner.models.lesson import Lesson
 from qlerner.models.word import Word
 from qlerner.forms.login import LoginForm
 from qlerner.forms.signin import SignIn
@@ -63,5 +64,30 @@ def logout():
     return redirect(url_for('routes.login'))
 
 @routes.route('/profile')
+@login_required
 def profile():
-    return "Nothing here"
+    user = current_user
+    solved_exercises = sum([exercise.is_solved for exercise in user.exercises])
+    return render_template('profile.html', user=user, solved_exercises=solved_exercises)
+
+@routes.route('/choose_lesson', methods=['GET'])
+@login_required
+def choose_lesson():
+    lesson = Lesson.query.all()
+    return render_template('choose_lesson.html', lesson=lesson)
+
+@routes.route('/solve_lesson/<int:lesson_id>', methods=['GET', 'POST'])
+@login_required
+def solve_lesson(lesson_id):
+    exercise = Exercise.query.get(lesson_id)
+    form = LessonForm()
+    if form.validate_on_submit():
+        if form.answer.data == exercise.answer:
+            # update user's solved exercises
+            current_user.solved_exercises.append(exercise)
+            db.session.commit()
+            flash('Congratulations! You solved the exercise!', 'success')
+            return redirect(url_for('routes.choose_exercise'))
+        else:
+            flash('Incorrect answer. Please try again.', 'danger')
+    return render_template('solve_exercise.html', form=form, exercise=exercise)
