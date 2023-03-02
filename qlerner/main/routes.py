@@ -6,10 +6,9 @@ from qlerner.models.exercise import *
 from qlerner.models.lesson import *
 from qlerner.models.word import *
 from qlerner.forms.login import LoginForm
-from qlerner.forms.signin import SignIn
 from qlerner.main.database import db
 from sqlalchemy import text
-from datetime import datetime
+from random import sample
 
 routes = Blueprint('routes', __name__)
 
@@ -82,6 +81,17 @@ def choose_lesson():
     lessons = Lesson.query.all()
     return render_template('choose_lesson.html', lessons=lessons)
 
+def return_options(exercise) -> list:
+    if exercise.type == "choose one":
+        all_words = Word.query.all()
+        # remove the correct answer from the list of words
+        words_without_answer = [word.quenya_tengwar for word in all_words if word.quenya_tengwar != exercise.answer]
+        # randomly select three wrong options from the remaining words
+        wrong_options = sample(words_without_answer, 3)
+        # combine the correct answer and the wrong options, shuffle the list
+        return sample([exercise.answer] + wrong_options, k=4)
+    return []
+
 @routes.route('/solve_lesson/<int:lesson_id>', methods=['GET', 'POST'])
 @login_required
 def solve_lesson(lesson_id):
@@ -90,7 +100,7 @@ def solve_lesson(lesson_id):
     current_index = int(request.args.get('current_index', 0))
     current_exercise_id = int(exercise_ids[current_index])
     current_exercise = Exercise.query.get(current_exercise_id)
-
+    current_exercise.options = return_options(current_exercise)
     if request.method == 'POST':
         # Check if answer is correct
         user_answer = request.form['answer']
@@ -122,9 +132,15 @@ def solve_lesson(lesson_id):
             next_index = current_index + 1
             next_exercise_id = int(exercise_ids[next_index])
             next_exercise = Exercise.query.get(next_exercise_id)
+            next_exercise.options = return_options(next_exercise)
             return render_template('solve_lesson.html', lesson=lesson, exercise=next_exercise, current_index=next_index)
 
         else:
             flash('Incorrect answer, please try again', 'danger')
     
     return render_template('solve_lesson.html', lesson=lesson, exercise=current_exercise, current_index=current_index)
+
+@routes.route('/words')
+def words():
+    words = Word.query.all()
+    return render_template('words.html', words=words)
