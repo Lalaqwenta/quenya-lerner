@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>Words List</h1>
+	<table>
+	<thead>
+		<tr>
+		<th>English Meaning</th>
+		<th>English Translation</th>
+		<th>Quenya</th>
+		<th>Quenya Transcription</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for word in words %}
+		<tr>
+		<td>{{ word.english_meaning }}</td>
+		<td>{{ word.english_translation }}</td>
+		<td><span class="tengwar">{{ word.quenya_tengwar }}</span></td>
+		<td>{{ word.quenya_transcription }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+	</table>
+{% endblock %}
