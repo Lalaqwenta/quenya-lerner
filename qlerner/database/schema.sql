@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS user_completed_lessons;
 
 CREATE TABLE users (
   id INTEGER PRIMARY KEY,
+  role TEXT NOT NULL DEFAULT 'user',
   username TEXT UNIQUE NOT NULL,
   email TEXT UNIQUE NOT NULL,
   remember_token TEXT,
@@ -88,8 +89,9 @@ INSERT INTO lessons (title, exercise_ids) VALUES
 ("Quenya Vocabulary Lesson 2", "4,5,6");
 
 -- Inserting test user
-INSERT INTO users (username, email, password)
-VALUES ('testuser', 'testuser@example.com', 'password');
+INSERT INTO users (username, email, password, role) VALUES
+('testuser', 'testuser@example.com', 'password', 'user'),
+('adminuser', 'admin@admin.com', 'adminpass', 'admin');
 
 -- Inserting some words too
 INSERT INTO words (english_meaning, english_translation, quenya_tengwar, quenya_transcription) VALUES
