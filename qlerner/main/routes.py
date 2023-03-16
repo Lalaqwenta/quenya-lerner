@@ -1,6 +1,6 @@
-from flask import Blueprint, request, flash, redirect, url_for, abort
-from flask import render_template
+from flask import Blueprint, request, flash, redirect, url_for, make_response, render_template
 from flask_login import login_user, current_user, logout_user, login_required
+from flask_babel import refresh, gettext
 from qlerner.models.user import *
 from qlerner.models.exercise import *
 from qlerner.models.lesson import *
@@ -13,6 +13,15 @@ from random import sample
 from functools import wraps
 
 routes = Blueprint('routes', __name__)
+
+def locale_select():
+    return request.cookies.get('LANG', 'en')
+
+@routes.route('/switch_language/<lang_code>')
+def switch_language(lang_code):
+    response = make_response(redirect(request.referrer))
+    response.set_cookie('LANG', lang_code)
+    return response
 
 @routes.route('/')
 def index():
@@ -32,17 +41,17 @@ def signup():
         confirm_password = form.confirm_password.data
 
         if password != confirm_password:
-            flash('Passwords do not match', 'danger')
+            flash(gettext('Passwords do not match'), 'danger')
             return redirect(url_for('routes.signup'))
 
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
-            flash('Username already exists', 'danger')
+            flash(gettext('Username already exists'), 'danger')
             return redirect(url_for('routes.signup'))
 
         existing_email = User.query.filter_by(email=email).first()
         if existing_email:
-            flash('Email already exists', 'danger')
+            flash(gettext('Email already exists'), 'danger')
             return redirect(url_for('routes.signup'))
 
         new_user = User(username=username, password=password, 
@@ -50,7 +59,7 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
 
-        flash('Account created successfully!', 'success')
+        flash(gettext('Account created successfully!'), 'success')
         return redirect(url_for('routes.login'))
     else:
         for err_field in form.errors:
@@ -71,7 +80,7 @@ def login():
             login_user(user, remember=form.remember_me.data)
             return redirect(url_for('routes.home'))
         else:
-            flash('Invalid email or password', 'danger')
+            flash(gettext('Invalid email or password'), 'danger')
     else:
         for err_field in form.errors:
             flash(form.errors[err_field])
@@ -159,7 +168,7 @@ def solve_lesson(lesson_id):
                     db.session.add(user_completed_lesson)
                 db.session.commit()
 
-                flash('Congratulations, you have completed the lesson!',
+                flash(gettext('Congratulations, you have completed the lesson!'),
                     'success')
                 return redirect(url_for('routes.choose_lesson'))
 
@@ -172,7 +181,7 @@ def solve_lesson(lesson_id):
                 current_index=next_index)
 
         else:
-            flash('Incorrect answer, please try again', 'danger')
+            flash(gettext('Incorrect answer, please try again'), 'danger')
     
     return render_template('solve_lesson.html', lesson=lesson, 
         exercise=current_exercise, current_index=current_index)
@@ -186,7 +195,7 @@ def admin_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
         if not current_user.is_authenticated or current_user.role != 'admin':
-            flash('You need to be an admin to access this page', 
+            flash(gettext('You need to be an admin to access this page'), 
                 'warning')
             return redirect(url_for('routes.home'))
         return func(*args, **kwargs)
@@ -194,10 +203,8 @@ def admin_required(func):
 
 @routes.route('/admin/create_exercise', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def create_exercise():
-    if current_user.role != "admin":
-        return abort(403)
-
     # handle form submission
     if request.method == 'POST':
         question = request.form['question']
@@ -206,7 +213,7 @@ def create_exercise():
 
         # validate form data
         if not question or not answer:
-            flash('Please enter both a question and an answer', 
+            flash(gettext('Please enter both a question and an answer'), 
                 'danger')
             return redirect(url_for('routes.create_exercise'))
 
@@ -216,8 +223,47 @@ def create_exercise():
         db.session.add(new_exercise)
         db.session.commit()
 
-        flash('Exercise created successfully', 'success')
+        flash(gettext('Exercise created successfully'), 'success')
         return redirect(url_for('routes.create_exercise'))
 
     # render the exercise creation form
     return render_template('create_exercise.html')
+
+@routes.route('/exercises', methods=['GET'])
+@login_required
+@admin_required
+def exercises():
+    search = request.args.get('search', '')
+    sort_by = request.args.get('sort_by', 'id')
+    sort_order = request.args.get('sort_order', 'asc')
+    exercises = Exercise.query.filter(
+        Exercise.tags.ilike(f'%{search}%') |
+        Exercise.type.ilike(f'%{search}%') |
+        Exercise.answer.ilike(f'%{search}%') |
+        Exercise.question.ilike(f'%{search}%') |
+        Exercise.hint.ilike(f'%{search}%')
+    ).order_by(text(f'{sort_by} {sort_order}')).all()
+    return render_template('exercises.html', exercises=exercises, search=search, sort_by=sort_by, sort_order=sort_order)
+
+@routes.route('/exercise/<int:exercise_id>/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_exercise(exercise_id):
+    # TODO: implement this route
+    pass
+
+
+@routes.route('/exercise/<int:exercise_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_exercise(exercise_id):
+    # TODO: implement this route
+    pass
+
+
+@routes.route('/exercise/<int:exercise_id>/copy', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def copy_exercise(exercise_id):
+    # TODO: implement this route
+    pass

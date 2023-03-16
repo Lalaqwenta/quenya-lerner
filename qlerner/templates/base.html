@@ -8,19 +8,24 @@
     <header>
         <nav>
             <ul>
-                <li><a href="{{ url_for('routes.home') }}">Home</a></li>
-                <li><a href="{{ url_for('routes.words') }}">Dictionary</a></li>
+                <li><a href="{{ url_for('routes.home') }}">{{ gettext('Home') }}</a></li>
+                <li><a href="{{ url_for('routes.words') }}">{{ gettext('Dictionary') }}</a></li>
+                <li>
+                    <a href="{{ url_for('routes.switch_language', lang_code='en') }}">{{ gettext('English') }}</a>
+                    <a href="{{ url_for('routes.switch_language', lang_code='ru') }}">{{ gettext('Русский') }}</a>
+                </li>
                 {% if current_user.is_authenticated %}
-                    <li><a href="{{ url_for('routes.profile') }}">Profile</a></li>
-                    <li><a href="{{ url_for('routes.choose_lesson') }}">Choose lesson</a></li>
-                    <li><a href="{{ url_for('routes.logout') }}">Logout</a></li> 
+                    <li><a href="{{ url_for('routes.profile') }}">{{ gettext('Profile') }}</a></li>
+                    <li><a href="{{ url_for('routes.choose_lesson') }}">{{ gettext('Choose lesson') }}</a></li>
+                    <li><a href="{{ url_for('routes.logout') }}">{{ gettext('Logout') }}</a></li> 
                     {% if current_user.role == "admin" %}
-                    <h2>Admin actions!</h2>
-                    <li><a href="{{ url_for('routes.create_exercise') }}">Create Exercise</a></li> 
+                    <h2>{{ gettext('Admin actions!') }}</h2>
+                    <li><a href="{{ url_for('routes.exercises') }}">{{ gettext('Manage Exercises') }}</a></li> 
+                    <li><a href="{{ url_for('routes.create_exercise') }}">{{ gettext('Create Exercise') }}</a></li> 
                     {% endif %}
                 {% else %}
-                    <li><a href="{{ url_for('routes.signup') }}">Sign up</a></li>
-                    <li><a href="{{ url_for('routes.login') }}">Log in</a></li>
+                    <li><a href="{{ url_for('routes.signup') }}">{{ gettext('Sign up') }}</a></li>
+                    <li><a href="{{ url_for('routes.login') }}">{{ gettext('Log in') }}</a></li>
                 {% endif %}
             </ul>
         </nav>
