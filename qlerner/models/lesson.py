@@ -13,6 +13,15 @@ class Lesson(db.Model):
     tags = db.Column(db.String)  # comma-separated list of tags
     exercise_ids = db.Column(db.String) # comma-separated list of exercises
 
+    def clone(self):
+        d = dict(self.__dict__)
+        d.pop("id")
+        d.pop("_sa_instance_state")
+        copy = self.__class__(**d)
+        db.session.add(copy)
+        db.session.commit()
+        return copy
+
 class UserCompletedLesson(db.Model):
     __tablename__ = 'user_completed_lessons'    
 

@@ -14,6 +14,16 @@ class Exercise(db.Model):
     hint = db.Column(db.String(100))
     tags = db.Column(db.String)  # comma-separated list of tags
 
+    def clone(self):
+        d = dict(self.__dict__)
+        d.pop("id")
+        d.pop("_sa_instance_state")
+        copy = self.__class__(**d)
+        db.session.add(copy)
+        db.session.commit()
+        return copy
+
+
 class UserCompletedExercise(db.Model):
     __tablename__ = 'user_completed_exercises'
 

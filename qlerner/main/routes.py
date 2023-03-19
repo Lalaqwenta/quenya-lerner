@@ -1,6 +1,6 @@
 from flask import Blueprint, request, flash, redirect, url_for, make_response, render_template
 from flask_login import login_user, current_user, logout_user, login_required
-from flask_babel import refresh, gettext
+from flask_babel import gettext
 from qlerner.models.user import *
 from qlerner.models.exercise import *
 from qlerner.models.lesson import *
@@ -201,6 +201,22 @@ def admin_required(func):
         return func(*args, **kwargs)
     return decorated_view
 
+@routes.route('/exercises', methods=['GET'])
+@login_required
+@admin_required
+def exercises():
+    search = request.args.get('search', '')
+    sort_by = request.args.get('sort_by', 'id')
+    sort_order = request.args.get('sort_order', 'asc')
+    exercises = Exercise.query.filter(
+        Exercise.tags.ilike(f'%{search}%') |
+        Exercise.type.ilike(f'%{search}%') |
+        Exercise.answer.ilike(f'%{search}%') |
+        Exercise.question.ilike(f'%{search}%') |
+        Exercise.hint.ilike(f'%{search}%')
+    ).order_by(text(f'{sort_by} {sort_order}')).all()
+    return render_template('exercises.html', exercises=exercises, search=search, sort_by=sort_by, sort_order=sort_order)
+
 @routes.route('/admin/create_exercise', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -229,21 +245,6 @@ def create_exercise():
     # render the exercise creation form
     return render_template('create_exercise.html')
 
-@routes.route('/exercises', methods=['GET'])
-@login_required
-@admin_required
-def exercises():
-    search = request.args.get('search', '')
-    sort_by = request.args.get('sort_by', 'id')
-    sort_order = request.args.get('sort_order', 'asc')
-    exercises = Exercise.query.filter(
-        Exercise.tags.ilike(f'%{search}%') |
-        Exercise.type.ilike(f'%{search}%') |
-        Exercise.answer.ilike(f'%{search}%') |
-        Exercise.question.ilike(f'%{search}%') |
-        Exercise.hint.ilike(f'%{search}%')
-    ).order_by(text(f'{sort_by} {sort_order}')).all()
-    return render_template('exercises.html', exercises=exercises, search=search, sort_by=sort_by, sort_order=sort_order)
 
 @routes.route('/exercise/<int:exercise_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -253,17 +254,18 @@ def edit_exercise(exercise_id):
     pass
 
 
-@routes.route('/exercise/<int:exercise_id>/delete', methods=['POST'])
+@routes.route('/exercise/<int:exercise_id>/delete', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def delete_exercise(exercise_id):
-    # TODO: implement this route
-    pass
+    Exercise.query.filter_by(id=exercise_id).delete()
+    db.session.commit()
+    return make_response(redirect(request.referrer))
 
 
 @routes.route('/exercise/<int:exercise_id>/copy', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def copy_exercise(exercise_id):
-    # TODO: implement this route
-    pass
+    Exercise.query.filter_by(id=exercise_id).first().clone()
+    return make_response(redirect(request.referrer))
