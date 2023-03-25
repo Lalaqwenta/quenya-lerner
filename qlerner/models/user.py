@@ -12,9 +12,6 @@ class User(db.Model, UserMixin):
     remember_token = db.Column(db.String(128), nullable=False, 
         default='')
 
-    def check_password(self, _password: str) -> bool:
-        return _password == self.password
-
 
 @lm.user_loader
 def load_user(user_id):

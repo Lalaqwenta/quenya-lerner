@@ -11,6 +11,7 @@ from qlerner.main.database import db
 from sqlalchemy import text
 from random import sample
 from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
 
 routes = Blueprint('routes', __name__)
 
@@ -53,8 +54,8 @@ def signup():
         if existing_email:
             flash(gettext('Email already exists'), 'danger')
             return redirect(url_for('routes.signup'))
-
-        new_user = User(username=username, password=password, 
+        hashed_password = generate_password_hash(password)
+        new_user = User(username=username, password=hashed_password, 
             email=email)
         db.session.add(new_user)
         db.session.commit()
@@ -76,7 +77,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(form.password.data):
+        if user and check_password_hash(user.password, form.password):
             login_user(user, remember=form.remember_me.data)
             return redirect(url_for('routes.home'))
         else:
