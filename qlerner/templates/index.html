@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<h1>Hello, World!</h1>
+	<h1>Welcome to the Quenya Learning App!</h1>
 	<p>This is a test of the Tengwar font.</p>
-	<p>Here is a sentence in Tengwar: <span class="tengwar">Annon edhellen, edro hi ammen!</span></p>
+	<p>Here is a sentence in Tengwar: {{ '$<Annon edhellen, edro hi ammen!$>'|tw }}</p>
 {% endblock %}

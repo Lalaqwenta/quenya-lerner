@@ -76,12 +76,12 @@ CREATE TABLE user_completed_exercises (
 
 -- Inserting the exercises first
 INSERT INTO exercises (type, question, answer, hint) VALUES
-("choose one", "What is the Quenya word for 'star'?", "elen", "Think of the constellation Orion."),
-("choose one", "What is the Quenya word for 'tree'?", "alda", "This word is also the name of a character in The Silmarillion."),
-("choose one", "What is the Quenya word for 'water'?", "nen", "This word appears in many names of locations in Middle-earth."),
-("choose one", "What is the Quenya word for 'love'?", "melme", "This word shares the same root as the name of the Vala associated with love."),
-("choose one", "What is the Quenya word for 'sun'?", "anar", "This word appears in the name of the royal family of Gondor."),
-("choose one", "What is the Quenya word for 'moon'?", "isil", "This word appears in the name of the elf princess who loved Beren.");
+("choose one", "What is the Quenya word for 'star'?", "$<elen$>", "Think of the constellation Orion."),
+("choose one", "What is the Quenya word for 'tree'?", "$<alda$>", "This word is also the name of a character in The Silmarillion."),
+("choose one", "What is the Quenya word for 'water'?", "$<nen$>", "This word appears in many names of locations in Middle-earth."),
+("choose one", "What is the Quenya word for 'love'?", "$<melme$>", "This word shares the same root as the name of the Vala associated with love."),
+("choose one", "What is the Quenya word for 'sun'?", "$<anar$>", "This word appears in the name of the royal family of Gondor."),
+("choose one", "What is the Quenya word for 'moon'?", "$<isil$>", "This word appears in the name of the elf princess who loved Beren.");
 
 -- Inserting two lessons using the exercises
 INSERT INTO lessons (title, exercise_ids) VALUES
@@ -95,17 +95,17 @@ INSERT INTO users (username, email, password, role) VALUES
 
 -- Inserting some words too
 INSERT INTO words (english_meaning, english_translation, quenya_tengwar, quenya_transcription) VALUES
-("star", "a celestial body that produces light", "elen", "elen"),
-("tree", "a perennial plant with a single stem or trunk", "alda", "alda"),
-("water", "a transparent, odorless, tasteless liquid", "nen", "nen"),
-("love", "an intense feeling of affection and connection", "melme", "melme"),
-("sun", "the star around which the Earth orbits", "anar", "anar"),
-("moon", "the natural satellite of the Earth", "isil", "isil"),
-("a", "the first letter of the English alphabet", "a", "anca"),
-("b", "the second letter of the English alphabet", "b", "umbar"),
-("c", "the third letter of the English alphabet", "c", "quesse"),
-("d", "the fourth letter of the English alphabet", "d", "ando"),
-("sword", "a weapon with a long metal blade and hilt", "anga", "anga"),
-("rose", "a flowering shrub with thorns", "lote", "lótë"),
-("mountain", "a large natural elevation of the earth's surface", "oron", "oron"),
-("horse", "a large four-legged mammal", "rocco", "rocco");
+("star", "a celestial body that produces light", "$<elen$>", "elen"),
+("tree", "a perennial plant with a single stem or trunk", "$<alda$>", "alda"),
+("water", "a transparent, odorless, tasteless liquid", "$<nen$>", "nen"),
+("love", "an intense feeling of affection and connection", "$<melme$>", "melme"),
+("sun", "the star around which the Earth orbits", "$<anar$>", "anar"),
+("moon", "the natural satellite of the Earth", "$<isil$>", "isil"),
+("a", "the first letter of the English alphabet", "$<a$>", "anca"),
+("b", "the second letter of the English alphabet", "$<b$>", "umbar"),
+("c", "the third letter of the English alphabet", "$<c$>", "quesse"),
+("d", "the fourth letter of the English alphabet", "$<d$>", "ando"),
+("sword", "a weapon with a long metal blade and hilt", "$<anga$>", "anga"),
+("rose", "a flowering shrub with thorns", "$<lote$>", "lótë"),
+("mountain", "a large natural elevation of the earth's surface", "$<oron$>", "oron"),
+("horse", "a large four-legged mammal", "$<rocco$>", "rocco");

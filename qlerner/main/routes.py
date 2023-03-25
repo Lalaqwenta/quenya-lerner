@@ -26,12 +26,9 @@ def switch_language(lang_code):
     return response
 
 @routes.route('/')
-def index():
-    return render_template('index.html')
-
-@routes.route('/home')
 def home():
-    return render_template('index.html')
+    text = "This is in english and $<This will be tengwar$>!"
+    return render_template('index.html', text=text)
 
 @routes.route('/signup', methods=['GET', 'POST'])
 def signup():

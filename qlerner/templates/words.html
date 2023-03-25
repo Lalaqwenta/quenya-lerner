@@ -16,7 +16,7 @@
 		<tr>
 		<td>{{ word.english_meaning }}</td>
 		<td>{{ word.english_translation }}</td>
-		<td><span class="tengwar">{{ word.quenya_tengwar }}</span></td>
+		<td>{{ word.quenya_tengwar|tw }}</td>
 		<td>{{ word.quenya_transcription }}</td>
 		</tr>
 		{% endfor %}

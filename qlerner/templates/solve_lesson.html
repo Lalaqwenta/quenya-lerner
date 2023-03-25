@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h3>{{ exercise.question }}</h3>
+  <h3>{{ exercise.question|tw }}</h3>
   <form method="POST" action="{{ url_for('routes.solve_lesson', lesson_id=lesson.id, current_index=current_index) }}">
     {% if exercise.type == "choose one" %}
     {% for option in exercise.options %}
       <input type="radio" id="{{ option }}" name="answer" value="{{ option }}">
-      <label for="{{ option }}"><span class="tengwar">{{ option }}</span></label><br>
+      <label for="{{ option }}">{{ option|tw }}</label><br>
     {% endfor %}
     {% elif exercise.type == "write" %}
       <input type="text" id="answer" name="answer">

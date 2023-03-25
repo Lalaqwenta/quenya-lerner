@@ -3,11 +3,13 @@ from qlerner.main.routes import *
 from qlerner.database.db import *
 from qlerner.main.login_manager import lm
 from qlerner.config import Config
+from qlerner.models.tengwarize import tengwarize
 from flask_babel import Babel
 
 app = Flask(__name__)
 app.register_blueprint(routes)
 app.config.from_object(Config)
+app.jinja_env.filters['tw'] = tengwarize
 
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 app.config['LANGUAGES'] = {
