@@ -12,6 +12,7 @@ from sqlalchemy import text
 from random import sample
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
+from validate_email import validate_email
 
 routes = Blueprint('routes', __name__)
 
@@ -76,12 +77,16 @@ def login():
 
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user and check_password_hash(user.password, form.password):
+         # Check if input is a valid email address
+        if validate_email(form.login_data.data):
+            user = User.query.filter_by(email=form.login_data.data).first()
+        else:
+            user = User.query.filter_by(username=form.login_data.data).first()
+        if user and check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect(url_for('routes.home'))
         else:
-            flash(gettext('Invalid email or password'), 'danger')
+            flash(gettext('Invalid login data!'), 'danger')
     else:
         for err_field in form.errors:
             flash(form.errors[err_field])

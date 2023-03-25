@@ -8,7 +8,7 @@
         <form method="POST" action="{{ url_for('routes.login') }}">
           {{ form.csrf_token }}
           <div class="form-group">
-            {{ form.email.label }} {{ form.email(class="form-control") }}
+            {{ form.login_data.label }} {{ form.login_data(class="form-control") }}
           </div>
           <div class="form-group">
             {{ form.password.label }} {{ form.password(class="form-control") }}

@@ -90,8 +90,8 @@ INSERT INTO lessons (title, exercise_ids) VALUES
 
 -- Inserting test user
 INSERT INTO users (username, email, password, role) VALUES
-('testuser', 'testuser@example.com', 'password', 'user'),
-('adminuser', 'admin@admin.com', 'adminpass', 'admin');
+('testuser', 'testuser@example.com', 'pbkdf2:sha256:260000$wD3bnaiOGoYvvNBc$6a16990013fa70b1037e991650ad74f80962e7cbee270e0f2768fa49d39b6650', 'user'), -- password
+('adminuser', 'admin@admin.com', 'pbkdf2:sha256:260000$PwEWzufrvo5oeX2l$2dfea3cf9eb0d44897e177e04ac6283e2b7a249b7fe8e5f46a6f2fbdd0157307', 'admin'); -- adminpass
 
 -- Inserting some words too
 INSERT INTO words (english_meaning, english_translation, quenya_tengwar, quenya_transcription) VALUES
