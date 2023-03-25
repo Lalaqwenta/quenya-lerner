@@ -1,0 +1,113 @@
+# Russian translations for PROJECT.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-03-17 00:19+0300\n"
+"PO-Revision-Date: 2023-03-16 23:56+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.12.1\n"
+
+#: main/routes.py:22
+msgid "Hello, world!"
+msgstr ""
+
+#: main/routes.py:48
+msgid "Passwords do not match"
+msgstr ""
+
+#: main/routes.py:53
+msgid "Username already exists"
+msgstr ""
+
+#: main/routes.py:58
+msgid "Email already exists"
+msgstr ""
+
+#: main/routes.py:66
+msgid "Account created successfully!"
+msgstr ""
+
+#: main/routes.py:87
+msgid "Invalid email or password"
+msgstr ""
+
+#: main/routes.py:175
+msgid "Congratulations, you have completed the lesson!"
+msgstr ""
+
+#: main/routes.py:188
+msgid "Incorrect answer, please try again"
+msgstr ""
+
+#: main/routes.py:202
+msgid "You need to be an admin to access this page"
+msgstr ""
+
+#: main/routes.py:220
+msgid "Please enter both a question and an answer"
+msgstr ""
+
+#: main/routes.py:230
+msgid "Exercise created successfully"
+msgstr ""
+
+#: templates/base.html:11
+msgid "Home"
+msgstr "Начало"
+
+#: templates/base.html:12
+msgid "Dictionary"
+msgstr "Словарь"
+
+#: templates/base.html:14
+msgid "English"
+msgstr ""
+
+#: templates/base.html:15
+msgid "Русский"
+msgstr ""
+
+#: templates/base.html:18
+msgid "Profile"
+msgstr "Профиль"
+
+#: templates/base.html:19
+msgid "Choose lesson"
+msgstr "Выберите урок"
+
+#: templates/base.html:20
+msgid "Logout"
+msgstr "Выйти из профиля"
+
+#: templates/base.html:22
+msgid "Admin actions!"
+msgstr "ОСТОРОЖНО, Действия для админского профиля"
+
+#: templates/base.html:23
+msgid "Manage Exercises"
+msgstr "Управление упражнениями"
+
+#: templates/base.html:24
+msgid "Create Exercise"
+msgstr "Создать упражнение"
+
+#: templates/base.html:27
+msgid "Sign up"
+msgstr "Регистрация"
+
+#: templates/base.html:28
+msgid "Log in"
+msgstr "Вход"
+

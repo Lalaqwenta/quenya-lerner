@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('routes.home') }}">{{ gettext('Home') }}</a></li>
+                <li><a href="{{ url_for('routes.words') }}">{{ gettext('Dictionary') }}</a></li>
+                <li>
+                    <a href="{{ url_for('routes.switch_language', lang_code='en') }}">{{ gettext('English') }}</a>
+                    <a href="{{ url_for('routes.switch_language', lang_code='ru') }}">{{ gettext('Русский') }}</a>
+                </li>
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('routes.profile') }}">{{ gettext('Profile') }}</a></li>
+                    <li><a href="{{ url_for('routes.choose_lesson') }}">{{ gettext('Choose lesson') }}</a></li>
+                    <li><a href="{{ url_for('routes.logout') }}">{{ gettext('Logout') }}</a></li> 
+                    {% if current_user.role == "admin" %}
+                    <h2>{{ gettext('Admin actions!') }}</h2>
+                    <li><a href="{{ url_for('routes.exercises') }}">{{ gettext('Manage Exercises') }}</a></li> 
+                    <li><a href="{{ url_for('routes.create_exercise') }}">{{ gettext('Create Exercise') }}</a></li> 
+                    {% endif %}
+                {% else %}
+                    <li><a href="{{ url_for('routes.signup') }}">{{ gettext('Sign up') }}</a></li>
+                    <li><a href="{{ url_for('routes.login') }}">{{ gettext('Log in') }}</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
