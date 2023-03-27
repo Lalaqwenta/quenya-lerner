@@ -7,4 +7,4 @@
 # fi
 
 # Build Docker image
-docker build -t quenya-lerner -f $DOCKERFILE .
+docker build -t lalaqwenta/quenya-lerner -f $DOCKERFILE .
