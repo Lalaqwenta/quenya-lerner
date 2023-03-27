@@ -19,10 +19,12 @@ python -m ensurepip --default-pip
 
 REM Install requirements
 echo Installing requirements...
-python -m pip install -r requirements.txt
+python -m pip install --upgrade pip -r requirements.txt
 
 REM Start the Flask server
 echo Starting Flask server...
 set FLASK_APP=qlerner
 set FLASK_ENV=development
-flask run --host=0.0.0.0 --port=5000
+python -m flask init-db
+start http://localhost:5000
+python -m flask run --host=0.0.0.0 --port=5000
