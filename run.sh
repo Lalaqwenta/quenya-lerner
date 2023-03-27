@@ -1,4 +1,4 @@
 #!/bin/bash
 
-build.sh
-start.sh
+./build.sh
+./start.sh
