@@ -1,0 +1,111 @@
+# Translations template for PROJECT.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-03-17 00:19+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.12.1\n"
+
+#: main/routes.py:22
+msgid "Hello, world!"
+msgstr ""
+
+#: main/routes.py:48
+msgid "Passwords do not match"
+msgstr ""
+
+#: main/routes.py:53
+msgid "Username already exists"
+msgstr ""
+
+#: main/routes.py:58
+msgid "Email already exists"
+msgstr ""
+
+#: main/routes.py:66
+msgid "Account created successfully!"
+msgstr ""
+
+#: main/routes.py:87
+msgid "Invalid email or password"
+msgstr ""
+
+#: main/routes.py:175
+msgid "Congratulations, you have completed the lesson!"
+msgstr ""
+
+#: main/routes.py:188
+msgid "Incorrect answer, please try again"
+msgstr ""
+
+#: main/routes.py:202
+msgid "You need to be an admin to access this page"
+msgstr ""
+
+#: main/routes.py:220
+msgid "Please enter both a question and an answer"
+msgstr ""
+
+#: main/routes.py:230
+msgid "Exercise created successfully"
+msgstr ""
+
+#: templates/base.html:11
+msgid "Home"
+msgstr ""
+
+#: templates/base.html:12
+msgid "Dictionary"
+msgstr ""
+
+#: templates/base.html:14
+msgid "English"
+msgstr ""
+
+#: templates/base.html:15
+msgid "Русский"
+msgstr ""
+
+#: templates/base.html:18
+msgid "Profile"
+msgstr ""
+
+#: templates/base.html:19
+msgid "Choose lesson"
+msgstr ""
+
+#: templates/base.html:20
+msgid "Logout"
+msgstr ""
+
+#: templates/base.html:22
+msgid "Admin actions!"
+msgstr ""
+
+#: templates/base.html:23
+msgid "Manage Exercises"
+msgstr ""
+
+#: templates/base.html:24
+msgid "Create Exercise"
+msgstr ""
+
+#: templates/base.html:27
+msgid "Sign up"
+msgstr ""
+
+#: templates/base.html:28
+msgid "Log in"
+msgstr ""
+
