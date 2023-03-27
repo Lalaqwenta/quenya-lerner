@@ -1,18 +1,28 @@
 @echo off
 
-:: Check if Docker is installed
-where docker >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Docker not found. Installing Docker...
-    powershell -Command "Invoke-WebRequest -Uri https://get.docker.com/builds/Windows/x86_64/docker-latest.exe -OutFile docker.exe"
-    docker.exe --version >nul 2>&1 || set PATH=%PATH%;%cd%
+REM Check if Python 3.10 is installed
+python --version | findstr /i "3.10" >nul && (
+    echo Python 3.10 is already installed.
+) || (
+    echo Installing Python 3.10...
+    REM Download the Python installer
+    curl https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe -o python-3.10.0-amd64.exe
+    REM Install Python 3.10
+    start /wait python-3.10.0-amd64.exe /quiet InstallAllUsers=1 PrependPath=1
+    REM Delete the installer
+    del python-3.10.0-amd64.exe
 )
 
-:: Pull the Docker image
-docker pull lalaqwenta/quenya-lerner
+REM Install pip
+echo Installing pip...
+python -m ensurepip --default-pip
 
-:: Run the Docker container
-start /b docker run -p 5000:80 lalaqwenta/quenya-lerner
+REM Install requirements
+echo Installing requirements...
+python -m pip install -r requirements.txt
 
-:: Open browser
-start http://localhost:5000
+REM Start the Flask server
+echo Starting Flask server...
+set FLASK_APP=qlerner
+set FLASK_ENV=development
+flask run --host=0.0.0.0 --port=5000
