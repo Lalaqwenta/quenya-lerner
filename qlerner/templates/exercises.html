@@ -46,9 +46,9 @@
             <tr>
               <th scope="row">{% if exercise.tags==None %}—{% else %}{{ exercise.tags }}{% endif %}</th>
               <td>{{ exercise.type }}</td>
-              <td>{{ exercise.question }}</td>
-              <td>{{ exercise.answer }}</td>
-              <td>{{ exercise.hint }}</td>
+              <td>{{ exercise.question|tw }}</td>
+              <td>{{ exercise.answer|tw }}</td>
+              <td>{{ exercise.hint|tw }}</td>
               <td>
                 <div class="btn-group" role="group">
                     <a href="{{ url_for('routes.edit_exercise', exercise_id=exercise.id) }}" class="btn btn-primary btn-sm">Edit</a>
