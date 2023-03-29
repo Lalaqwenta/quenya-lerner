@@ -1,5 +1,4 @@
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
 from qlerner.main.database import db
 
 completed_exercises_NAMETAG = 'completed_exercises'
@@ -10,7 +9,7 @@ class Exercise(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.Text, nullable=False)
     answer = db.Column(db.Text, nullable=False)
-    type = db.Column(db.Text, nullable=False, default='write')
+    type = db.Column(db.String(20), nullable=False, default='write')
     hint = db.Column(db.String(100))
     tags = db.Column(db.String)  # comma-separated list of tags
 
@@ -22,7 +21,6 @@ class Exercise(db.Model):
         db.session.add(copy)
         db.session.commit()
         return copy
-
 
 class UserCompletedExercise(db.Model):
     __tablename__ = 'user_completed_exercises'

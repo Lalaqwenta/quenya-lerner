@@ -1,10 +1,11 @@
-from flask import Blueprint, request, flash, redirect, url_for, make_response, render_template
+from flask import Blueprint, request, flash, redirect, url_for, make_response, render_template, abort
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_babel import gettext
 from qlerner.models.user import *
 from qlerner.models.exercise import *
 from qlerner.models.lesson import *
 from qlerner.models.word import *
+from qlerner.models.tags import *
 from qlerner.forms.login import LoginForm
 from qlerner.forms.signin import SignupForm
 from qlerner.main.database import db
@@ -229,6 +230,7 @@ def create_exercise():
         question = request.form['question']
         answer = request.form['answer']
         hint = request.form['hint']
+        tags = request.form['tags']
 
         # validate form data
         if not question or not answer:
@@ -238,8 +240,18 @@ def create_exercise():
 
         # create a new exercise and add it to the database
         new_exercise = Exercise(question=question, answer=answer, 
-            hint=hint)
+            hint=hint, tags = tags)
         db.session.add(new_exercise)
+        db.session.commit()
+        tags_list = tags.split(',')
+        for tag in tags_list:
+            tag_id = Tags.query.filter_by(tag=tag).first()
+            if tag_id == None:
+                new_tag = Tags(tag=tag)
+                db.session.add(new_tag)
+                db.session.commit()
+                tag_id = new_tag.id
+            exercise_tags.insert().values(exercise_id=new_exercise.id, tag_id=tag_id)
         db.session.commit()
 
         flash(gettext('Exercise created successfully'), 'success')
@@ -253,8 +265,39 @@ def create_exercise():
 @login_required
 @admin_required
 def edit_exercise(exercise_id):
-    # TODO: implement this route
-    pass
+    exercise = Exercise.query.filter_by(id=exercise_id).first_or_404()
+
+    if request.method == 'POST':
+        # Update exercise data
+        exercise.question = request.form['question']
+        exercise.answer = request.form['answer']
+        exercise.hint = request.form['hint']
+        old_tags = set(exercise.tags.split(',') if exercise.tags != None else [])
+        exercise.tags = request.form['tags']
+        new_tags = set(exercise.tags.split(',') if exercise.tags != None else [])
+        tags_to_add = new_tags - old_tags
+        tags_to_delete = old_tags - new_tags
+
+        # Add new tags to the exercise_tags table
+        for tag in tags_to_add:
+            tag_id = Tags.query.filter_by(tag=tag).first()
+            if tag_id == None:
+                new_tag = Tags(tag=tag)
+                db.session.add(new_tag)
+                db.session.commit()
+                tag_id = new_tag.id
+            exercise_tags.insert().values(exercise_id=exercise.id, tag_id=tag_id)
+        for tag in tags_to_delete:
+            tag_id = Tags.query.filter_by(tag=tag).first()
+            exercise_tags.delete().where(exercise_id==exercise.id, tag_id==tag_id)
+
+        db.session.commit()
+
+        flash(gettext('Exercise updated successfully'), 'success')
+        return redirect(url_for('routes.exercises'))
+
+    return render_template('edit_exercise.html', exercise=exercise)
+
 
 
 @routes.route('/exercise/<int:exercise_id>/delete', methods=['GET', 'POST'])

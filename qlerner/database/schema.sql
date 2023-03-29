@@ -41,19 +41,40 @@ CREATE TABLE lessons (
   FOREIGN KEY (exercise_ids) REFERENCES exercises (id)
 );
 
+CREATE TABLE tags (
+    id INTEGER NOT NULL,
+    tag VARCHAR(20),
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE lesson_tags (
-  id INTEGER PRIMARY KEY,
-  tag_name TEXT NOT NULL,
-  lesson_id INTEGER NOT NULL,
-  FOREIGN KEY (lesson_id) REFERENCES lessons (id)
+    lesson_id INTEGER,
+    tag_id INTEGER,
+    FOREIGN KEY (lesson_id) REFERENCES lessons (id),
+    FOREIGN KEY (tag_id) REFERENCES tags (id)
+);
+
+CREATE TABLE user_tags (
+    user_id INTEGER,
+    tag_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (tag_id) REFERENCES tags (id)
 );
 
 CREATE TABLE exercise_tags (
-  id INTEGER PRIMARY KEY,
-  tag_name TEXT NOT NULL,
-  exercise_id INTEGER NOT NULL,
-  FOREIGN KEY (exercise_id) REFERENCES exercises (id)
+    exercise_id INTEGER,
+    tag_id INTEGER,
+    FOREIGN KEY (exercise_id) REFERENCES exercises (id),
+    FOREIGN KEY (tag_id) REFERENCES tags (id)
 );
+
+CREATE TABLE word_tags (
+    word_id INTEGER,
+    tag_id INTEGER,
+    FOREIGN KEY (word_id) REFERENCES words (id),
+    FOREIGN KEY (tag_id) REFERENCES tags (id)
+);
+
 
 CREATE TABLE user_completed_lessons (
   user_id INTEGER,
