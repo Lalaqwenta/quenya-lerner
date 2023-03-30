@@ -24,8 +24,7 @@ CREATE TABLE exercises (
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
   type TEXT NOT NULL DEFAULT 'write',
-  hint TEXT,
-  tags TEXT
+  hint TEXT
 );
 
 CREATE TABLE words (

@@ -104,7 +104,7 @@ def profile():
     query = text("SELECT * FROM {table} WHERE user_id = '{user_id}'"
         .format(
         table=user_completed_lessons_NAMETAG, user_id=user.id
-    ))
+    )) #TODO this shit is one to one relation and will fall if two users complete the same lesson
     solved_lessons = len(db.engine.connect().execute(query).fetchall())
     return render_template('profile.html', user=user, 
         solved_lessons=solved_lessons)
@@ -212,14 +212,24 @@ def exercises():
     search = request.args.get('search', '')
     sort_by = request.args.get('sort_by', 'id')
     sort_order = request.args.get('sort_order', 'asc')
-    exercises = Exercise.query.filter(
-        Exercise.tags.ilike(f'%{search}%') |
+    exercises_query = Exercise.query.filter(
         Exercise.type.ilike(f'%{search}%') |
         Exercise.answer.ilike(f'%{search}%') |
         Exercise.question.ilike(f'%{search}%') |
         Exercise.hint.ilike(f'%{search}%')
-    ).order_by(text(f'{sort_by} {sort_order}')).all()
+    ).order_by(text(f'{sort_by} {sort_order}'))
+    exercises = []
+    for exercise in exercises_query.all():
+        old_tags = set(db.session.execute(
+        exercise_tags.select().filter_by(
+            exercise_id=exercise.id
+            )).fetchall())
+        exercise.tags = ','.join(
+            [Tags.query.filter_by(id=tag.tag_id).first_or_404().tag for tag in old_tags]
+            ) if len(old_tags) > 0 else "—"
+        exercises.append(exercise)
     return render_template('exercises.html', exercises=exercises, search=search, sort_by=sort_by, sort_order=sort_order)
+
 
 @routes.route('/admin/create_exercise', methods=['GET', 'POST'])
 @login_required
@@ -240,7 +250,7 @@ def create_exercise():
 
         # create a new exercise and add it to the database
         new_exercise = Exercise(question=question, answer=answer, 
-            hint=hint, tags = tags)
+            hint=hint)
         db.session.add(new_exercise)
         db.session.commit()
         tags_list = tags.split(',')
@@ -266,30 +276,33 @@ def create_exercise():
 @admin_required
 def edit_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first_or_404()
+    tags = set(db.session.execute(
+        exercise_tags.select().filter_by(
+            exercise_id=exercise_id
+            )).fetchall())
+    old_tags = set([Tags.query.filter_by(id=tag.tag_id).first_or_404().tag for tag in tags])
+    exercise.tags=','.join(old_tags) if len(old_tags) > 0 else ''
 
     if request.method == 'POST':
         # Update exercise data
         exercise.question = request.form['question']
         exercise.answer = request.form['answer']
         exercise.hint = request.form['hint']
-        old_tags = set(exercise.tags.split(',') if exercise.tags != None else [])
-        exercise.tags = request.form['tags']
-        new_tags = set(exercise.tags.split(',') if exercise.tags != None else [])
+        new_tags = set( request.form['tags'].split(',') if request.form['tags'] != '' else [])
         tags_to_add = new_tags - old_tags
         tags_to_delete = old_tags - new_tags
 
         # Add new tags to the exercise_tags table
         for tag in tags_to_add:
-            tag_id = Tags.query.filter_by(tag=tag).first()
-            if tag_id == None:
-                new_tag = Tags(tag=tag)
-                db.session.add(new_tag)
+            tag_search = Tags.query.filter_by(tag=tag).first()
+            if tag_search == None:
+                tag_search = Tags(tag=tag)
+                db.session.add(tag_search)
                 db.session.commit()
-                tag_id = new_tag.id
-            exercise_tags.insert().values(exercise_id=exercise.id, tag_id=tag_id)
+            db.session.execute(exercise_tags.insert().values(exercise_id=exercise_id, tag_id=tag_search.id))
         for tag in tags_to_delete:
-            tag_id = Tags.query.filter_by(tag=tag).first()
-            exercise_tags.delete().where(exercise_id==exercise.id, tag_id==tag_id)
+            tag_search = Tags.query.filter_by(tag=tag).first_or_404()
+            db.session.execute(exercise_tags.delete().filter_by(exercise_id=exercise_id, tag_id=tag_search.id))
 
         db.session.commit()
 
@@ -314,4 +327,5 @@ def delete_exercise(exercise_id):
 @admin_required
 def copy_exercise(exercise_id):
     Exercise.query.filter_by(id=exercise_id).first().clone()
+    #TODO tags must also be copied
     return make_response(redirect(request.referrer))

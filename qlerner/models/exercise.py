@@ -11,7 +11,6 @@ class Exercise(db.Model):
     answer = db.Column(db.Text, nullable=False)
     type = db.Column(db.String(20), nullable=False, default='write')
     hint = db.Column(db.String(100))
-    tags = db.Column(db.String)  # comma-separated list of tags
 
     def clone(self):
         d = dict(self.__dict__)
