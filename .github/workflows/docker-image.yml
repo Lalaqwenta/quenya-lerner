@@ -34,5 +34,5 @@ jobs:
         context: .
         file: ./Dockerfile.dev
         push: true
-        tags: ${{ steps.meta.outputs.tags }}-${{ github.sha }}
+        tags: ${{ steps.meta.outputs.tags }} , lalaqwenta/quenya-lerner:${{ github.sha }} , lalaqwenta/quenya-lerner:latest
         labels: ${{ steps.meta.outputs.labels }}
