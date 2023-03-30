@@ -212,22 +212,28 @@ def exercises():
     search = request.args.get('search', '')
     sort_by = request.args.get('sort_by', 'id')
     sort_order = request.args.get('sort_order', 'asc')
-    exercises_query = Exercise.query.filter(
-        Exercise.type.ilike(f'%{search}%') |
-        Exercise.answer.ilike(f'%{search}%') |
-        Exercise.question.ilike(f'%{search}%') |
-        Exercise.hint.ilike(f'%{search}%')
-    ).order_by(text(f'{sort_by} {sort_order}'))
-    exercises = []
-    for exercise in exercises_query.all():
-        old_tags = set(db.session.execute(
-        exercise_tags.select().filter_by(
-            exercise_id=exercise.id
-            )).fetchall())
-        exercise.tags = ','.join(
-            [Tags.query.filter_by(id=tag.tag_id).first_or_404().tag for tag in old_tags]
-            ) if len(old_tags) > 0 else "—"
-        exercises.append(exercise)
+    search = request.args.get('search', '')
+
+    sql = """
+    SELECT e.*, GROUP_CONCAT(t.tag) as tags
+    FROM exercises e
+    LEFT JOIN exercise_tags et ON e.id = et.exercise_id
+    LEFT JOIN tags t ON t.id = et.tag_id
+    WHERE e.type ILIKE :search 
+    OR e.answer ILIKE :search 
+    OR e.question ILIKE :search 
+    OR e.hint ILIKE :search 
+    OR t.tag ILIKE :search 
+    GROUP BY e.id
+    ORDER BY {0} {1}
+    """.format(sort_by, sort_order) if search != '' else """SELECT e.*, GROUP_CONCAT(t.tag) as tags
+    FROM exercises e
+    LEFT JOIN exercise_tags et ON e.id = et.exercise_id
+    LEFT JOIN tags t ON t.id = et.tag_id
+    GROUP BY e.id
+    ORDER BY {0} {1}""".format(sort_by, sort_order)
+
+    exercises = db.session.execute(text(sql), {'search': f'%{search}%'}).fetchall()
     return render_template('exercises.html', exercises=exercises, search=search, sort_by=sort_by, sort_order=sort_order)
 
 
@@ -261,7 +267,7 @@ def create_exercise():
                 db.session.add(new_tag)
                 db.session.commit()
                 tag_id = new_tag.id
-            exercise_tags.insert().values(exercise_id=new_exercise.id, tag_id=tag_id)
+            db.session.execute(exercise_tags.insert().values(exercise_id=new_exercise.id, tag_id=tag_id))
         db.session.commit()
 
         flash(gettext('Exercise created successfully'), 'success')
