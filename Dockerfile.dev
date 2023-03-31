@@ -10,5 +10,6 @@ COPY . .
 
 ENV FLASK_APP qlerner
 
-RUN flask --app qlerner init-db
+# generate templates and initiate db
+RUN python jinja.py && flask --app qlerner init-db
 CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
