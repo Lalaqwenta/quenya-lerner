@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-12">
+        <h2>{{ entity_name }}</h2>
+        <div class="row my-3">
+          <div class="col-md-6">
+            <form action="" method="GET">
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search {{ entity_name|lower }}s..." name="search" value="{{ search }}">
+                <div class="input-group-append">
+                  <button href="{{ url_for(entity_name.lower() + '_routes.' + entity_name.lower() + 's') }}?search=search" class="btn btn-outline-secondary" type="submit">Search</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-6 text-right">
+            <a href="{{ url_for(entity_name.lower() + '_routes.create_' + entity_name.lower()) }}" class="btn btn-primary">Add {{ entity_name }}</a>
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="sortDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Sort By {% if sort_by==None %}ID{% endif %}{% for c in sort_by.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}
+            </button>
+          </div>
+        </div>
+        <table class="table">
+          <thead>
+            <tr aria-labelledby="sortDropdown">
+              <th scope="col"><a class="dropdown-item" href="{{ url_for(entity_name.lower() + '_routes.' + entity_name.lower() + 's') }}?sort_by=tags">Tags</a></th>
+              {% for column in columns %}{% if column not in ['id', 'password'] %}<th scope="col"><a class="dropdown-item" href="{{ url_for(entity_name.lower() + '_routes.' + entity_name.lower() + 's') }}?sort_by={{ column }}">{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}</a></th>{% endif %}{% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for entity in entities %}
+            <tr>
+              <th scope="row">{% if entity.tags==None %}—{% else %}{{ entity.tags }}{% endif %}</th>
+              {% for column in entity[1:] %}<td>
+                {{ column|tw if not (loop.last or (entity_name == 'User' and loop.index == 4)) }}
+              </td>{% endfor%}
+              <td>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for( entity_name.lower() + '_routes.edit_' + entity_name.lower(),  id=entity[0]) }}" class="btn btn-primary btn-sm">Edit</a>
+                    {% if entity_name != 'User' %}<a href="{{ url_for( entity_name.lower() + '_routes.copy_' + entity_name.lower(),  id=entity[0]) }}" class="btn btn-info btn-sm">Copy</a>{% endif %}
+                    <a href="{{ url_for( entity_name.lower() + '_routes.delete_' + entity_name.lower(), id=entity[0]) }}" class="btn btn-danger btn-sm">Delete</a>
+                </div>                
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

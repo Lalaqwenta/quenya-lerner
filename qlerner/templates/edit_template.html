@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ entity_name }}{% endblock %}
+
+{% block content %}
+  <h1>Edit {{ entity_name }}</h1>
+  <hr>
+
+  <form method="POST">
+    {% for column in columns %}<div class="form-group">
+      <label for="{{ column }}">{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}:</label>
+      <textarea class="form-control" id="{{ column }}" name="{{ column }}">{{ entity[column] if column not in ['password']}}</textarea>
+    </div>{% endfor %}
+
+    <div class="form-group">
+      <label for="tags">Tags (comma-separated)</label>
+      <input class="form-control" id="tags" name="tags" value="{{ entity['tags'] }}">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+
+  <hr>
+
+{% endblock %}
