@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Jinja generated files
+qlerner/main/*_routes.py
+
 # C extensions
 *.so
 
