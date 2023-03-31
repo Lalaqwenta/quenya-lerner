@@ -190,10 +190,10 @@ def solve_lesson(lesson_id):
     return render_template('solve_lesson.html', lesson=lesson, 
         exercise=current_exercise, current_index=current_index)
 
-@routes.route('/words')
-def words():
+@routes.route('/dictionary')
+def dictionary():
     words = Word.query.all()
-    return render_template('words.html', words=words)
+    return render_template('dictionary.html', words=words)
 
 def admin_required(func):
     @wraps(func)
@@ -204,134 +204,3 @@ def admin_required(func):
             return redirect(url_for('routes.home'))
         return func(*args, **kwargs)
     return decorated_view
-
-@routes.route('/exercises', methods=['GET'])
-@login_required
-@admin_required
-def exercises():
-    search = request.args.get('search', '')
-    sort_by = request.args.get('sort_by', 'id')
-    sort_order = request.args.get('sort_order', 'asc')
-    search = request.args.get('search', '')
-
-    sql = """
-    SELECT e.*, GROUP_CONCAT(t.tag) as tags
-    FROM exercises e
-    LEFT JOIN exercise_tags et ON e.id = et.exercise_id
-    LEFT JOIN tags t ON t.id = et.tag_id
-    WHERE e.type ILIKE :search 
-    OR e.answer ILIKE :search 
-    OR e.question ILIKE :search 
-    OR e.hint ILIKE :search 
-    OR t.tag ILIKE :search 
-    GROUP BY e.id
-    ORDER BY {0} {1}
-    """.format(sort_by, sort_order) if search != '' else """SELECT e.*, GROUP_CONCAT(t.tag) as tags
-    FROM exercises e
-    LEFT JOIN exercise_tags et ON e.id = et.exercise_id
-    LEFT JOIN tags t ON t.id = et.tag_id
-    GROUP BY e.id
-    ORDER BY {0} {1}""".format(sort_by, sort_order)
-
-    exercises = db.session.execute(text(sql), {'search': f'%{search}%'}).fetchall()
-    return render_template('exercises.html', exercises=exercises, search=search, sort_by=sort_by, sort_order=sort_order)
-
-
-@routes.route('/admin/create_exercise', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def create_exercise():
-    # handle form submission
-    if request.method == 'POST':
-        question = request.form['question']
-        answer = request.form['answer']
-        hint = request.form['hint']
-        tags = request.form['tags']
-
-        # validate form data
-        if not question or not answer:
-            flash(gettext('Please enter both a question and an answer'), 
-                'danger')
-            return redirect(url_for('routes.create_exercise'))
-
-        # create a new exercise and add it to the database
-        new_exercise = Exercise(question=question, answer=answer, 
-            hint=hint)
-        db.session.add(new_exercise)
-        db.session.commit()
-        tags_list = tags.split(',')
-        for tag in tags_list:
-            tag_id = Tags.query.filter_by(tag=tag).first()
-            if tag_id == None:
-                new_tag = Tags(tag=tag)
-                db.session.add(new_tag)
-                db.session.commit()
-                tag_id = new_tag.id
-            db.session.execute(exercise_tags.insert().values(exercise_id=new_exercise.id, tag_id=tag_id))
-        db.session.commit()
-
-        flash(gettext('Exercise created successfully'), 'success')
-        return redirect(url_for('routes.create_exercise'))
-
-    # render the exercise creation form
-    return render_template('create_exercise.html')
-
-
-@routes.route('/exercise/<int:exercise_id>/edit', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def edit_exercise(exercise_id):
-    exercise = Exercise.query.filter_by(id=exercise_id).first_or_404()
-    tags = set(db.session.execute(
-        exercise_tags.select().filter_by(
-            exercise_id=exercise_id
-            )).fetchall())
-    old_tags = set([Tags.query.filter_by(id=tag.tag_id).first_or_404().tag for tag in tags])
-    exercise.tags=','.join(old_tags) if len(old_tags) > 0 else ''
-
-    if request.method == 'POST':
-        # Update exercise data
-        exercise.question = request.form['question']
-        exercise.answer = request.form['answer']
-        exercise.hint = request.form['hint']
-        new_tags = set( request.form['tags'].split(',') if request.form['tags'] != '' else [])
-        tags_to_add = new_tags - old_tags
-        tags_to_delete = old_tags - new_tags
-
-        # Add new tags to the exercise_tags table
-        for tag in tags_to_add:
-            tag_search = Tags.query.filter_by(tag=tag).first()
-            if tag_search == None:
-                tag_search = Tags(tag=tag)
-                db.session.add(tag_search)
-                db.session.commit()
-            db.session.execute(exercise_tags.insert().values(exercise_id=exercise_id, tag_id=tag_search.id))
-        for tag in tags_to_delete:
-            tag_search = Tags.query.filter_by(tag=tag).first_or_404()
-            db.session.execute(exercise_tags.delete().filter_by(exercise_id=exercise_id, tag_id=tag_search.id))
-
-        db.session.commit()
-
-        flash(gettext('Exercise updated successfully'), 'success')
-        return redirect(url_for('routes.exercises'))
-
-    return render_template('edit_exercise.html', exercise=exercise)
-
-
-
-@routes.route('/exercise/<int:exercise_id>/delete', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def delete_exercise(exercise_id):
-    Exercise.query.filter_by(id=exercise_id).delete()
-    db.session.commit()
-    return make_response(redirect(request.referrer))
-
-
-@routes.route('/exercise/<int:exercise_id>/copy', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def copy_exercise(exercise_id):
-    Exercise.query.filter_by(id=exercise_id).first().clone()
-    #TODO tags must also be copied
-    return make_response(redirect(request.referrer))
