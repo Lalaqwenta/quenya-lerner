@@ -10,6 +10,11 @@
           <input type="text" id="{{ column }}" name="{{ column }}" required><br>{% endif %}{% endfor %}
           <label for="tags">Tags :</label>
           <input type="text" id="tags" name="tags" required><br>
+          {% if entity_name == 'Lesson' %}<select name="exercises" id="exercises" multiple>
+            <table class="table">{% for exercise in exercises %}{% set edict = exercise._asdict()%}
+              <tr><option value="{{ exercise.id }}">{% for column in edict %}<td>{{ edict[column]|tw }}</td>{% endfor %}</option></tr>
+            {% endfor %}</table>
+          </select><br>{% endif %}
           <input type="submit" value="Create {{ entity_name }}">
         </form>
       </div>
