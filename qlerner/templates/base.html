@@ -9,7 +9,7 @@
         <nav>
             <ul>
                 <li><a href="{{ url_for('routes.home') }}">{{ gettext('Home') }}</a></li>
-                <li><a href="{{ url_for('routes.words') }}">{{ gettext('Dictionary') }}</a></li>
+                <li><a href="{{ url_for('routes.dictionary') }}">{{ gettext('Dictionary') }}</a></li>
                 <li>
                     <a href="{{ url_for('routes.switch_language', lang_code='en') }}">{{ gettext('English') }}</a>
                     <a href="{{ url_for('routes.switch_language', lang_code='ru') }}">{{ gettext('Русский') }}</a>
@@ -20,8 +20,9 @@
                     <li><a href="{{ url_for('routes.logout') }}">{{ gettext('Logout') }}</a></li> 
                     {% if current_user.role == "admin" %}
                     <h2>{{ gettext('Admin actions!') }}</h2>
-                    <li><a href="{{ url_for('routes.exercises') }}">{{ gettext('Manage Exercises') }}</a></li> 
-                    <li><a href="{{ url_for('routes.create_exercise') }}">{{ gettext('Create Exercise') }}</a></li> 
+                    {% for entity in [gettext('User'), gettext('Lesson'), gettext('Exercise'), gettext('Word')] %}
+                    <li><a href="{{ url_for(entity.lower() + '_routes.' + entity.lower() + 's') }}">{{ gettext('Manage') }} {{ entity }}s</a></li>
+                    <li><a href="{{ url_for(entity.lower() + '_routes.create_' + entity.lower()) }}">{{ gettext('Create') }} {{ entity }}</a></li>{% endfor %}
                     {% endif %}
                 {% else %}
                     <li><a href="{{ url_for('routes.signup') }}">{{ gettext('Sign up') }}</a></li>
