@@ -10,7 +10,6 @@ class Lesson(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
-    tags = db.Column(db.String)  # comma-separated list of tags
     exercise_ids = db.Column(db.String) # comma-separated list of exercises
 
     def clone(self):
