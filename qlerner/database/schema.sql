@@ -10,12 +10,14 @@ DROP TABLE IF EXISTS exercise_tags;
 DROP TABLE IF EXISTS user_completed_exercises;
 DROP TABLE IF EXISTS user_completed_lessons;
 
+-- TODO: Check if all these tables fields are in the same orders, as everywhere else!
+-- That is important!
 CREATE TABLE users (
   id INTEGER PRIMARY KEY,
   role TEXT NOT NULL DEFAULT 'user',
   username TEXT UNIQUE NOT NULL,
   email TEXT UNIQUE NOT NULL,
-  remember_token TEXT,
+  -- remember_token TEXT,
   password TEXT NOT NULL
 );
 
@@ -38,7 +40,6 @@ CREATE TABLE words (
 CREATE TABLE lessons (
   id INTEGER PRIMARY KEY,
   title TEXT NOT NULL,
-  tags TEXT,
   exercise_ids TEXT NOT NULL,
   FOREIGN KEY (exercise_ids) REFERENCES exercises (id)
 );
