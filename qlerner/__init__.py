@@ -1,5 +1,9 @@
 from flask import Flask
-from qlerner.main.routes import *
+from qlerner.main.routes import routes, locale_select
+from qlerner.main.exercise_routes import exercise_routes
+from qlerner.main.user_routes import user_routes
+from qlerner.main.lesson_routes import lesson_routes
+from qlerner.main.word_routes import word_routes
 from qlerner.database.db import *
 from qlerner.main.login_manager import lm
 from qlerner.config import Config
@@ -8,6 +12,10 @@ from flask_babel import Babel
 
 app = Flask(__name__)
 app.register_blueprint(routes)
+app.register_blueprint(exercise_routes)
+app.register_blueprint(user_routes)
+app.register_blueprint(lesson_routes)
+app.register_blueprint(word_routes)
 app.config.from_object(Config)
 app.jinja_env.filters['tw'] = tengwarize
 
