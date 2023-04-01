@@ -61,13 +61,13 @@ def create_{{ entity_name|lower }}():
         exercise_ids = ','.join(request.form.getlist('exercises')){% else %}
         {{ column }} = request.form['{{ column }}']{% endif %}{% endfor %}
         tags = request.form['tags']
-        {% if entity_name.lower() in ['user']%}
         # validate form data
-        if not {{ columns[0] }} or not {{ columns[1] }}:
-            flash(gettext('Please enter both a question and an answer'), 
+        required_data = [column.name for column in {{ entity_name }}.__table__.columns._all_columns if not column.nullable]
+        {% for column in columns[1:] %}if '{{ column }}' in required_data and not {{ column }}:
+            flash(gettext('Please enter {{ column }}'), 
                 'danger')
             return redirect(url_for('{{ entity_name|lower }}_routes.create_{{ entity_name|lower }}'))
-        {% endif %}
+        {% endfor %}
         # create a new {{ entity_name|lower }} and add it to the database
         new_{{ entity_name|lower }} = {{ entity_name }}(
             {% for column in columns[1:] %}{{ column }}={{ column }},{% endfor %}
