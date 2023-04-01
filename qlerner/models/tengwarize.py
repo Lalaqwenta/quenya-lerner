@@ -4,5 +4,5 @@ _tengwar_beginning = '<span class="tengwar">'
 _tengwar_ending = '</span>'
 
 def tengwarize(value):
-    # Transforms <...> into <span class="tengwar">...</span>
-    return do_mark_safe(value.replace('$<', _tengwar_beginning).replace('$>', _tengwar_ending)) if value is not None else value
+    # Transforms $<...$> into <span class="tengwar">...</span>
+    return do_mark_safe(value.replace('$<', _tengwar_beginning).replace('$>', _tengwar_ending)) if type(value) == str else value
