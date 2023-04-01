@@ -1,25 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}Edit {{ entity_name }}{% endblock %}
-
 {% block content %}
-  <h1>Edit {{ entity_name }}</h1>
-  <hr>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <h2>Edit {{ entity_name }}</h2>
+      <form method="POST">
+        {% for column in columns %}{% if column not in ['id', 'exercise_ids'] %}<div class="form-group">
+          <label for="{{ column }}">{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}:</label>
+          <textarea class="form-control" id="{{ column }}" name="{{ column }}">{{ entity[column] if column not in ['password']}}</textarea>
+        </div>{% endif %}{% endfor %}
 
-  <form method="POST">
-    {% for column in columns %}<div class="form-group">
-      <label for="{{ column }}">{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}:</label>
-      <textarea class="form-control" id="{{ column }}" name="{{ column }}">{{ entity[column] if column not in ['password']}}</textarea>
-    </div>{% endfor %}
-
-    <div class="form-group">
-      <label for="tags">Tags (comma-separated)</label>
-      <input class="form-control" id="tags" name="tags" value="{{ entity['tags'] }}">
+        <div class="form-group">
+          <label for="tags">Tags (comma-separated)</label>
+          <input class="form-control" id="tags" name="tags" value="{{ entity['tags'] }}">
+        </div>
+        {% if entity_name == 'Lesson' %}
+        <div>
+          <label for="search">Search:</label>
+          <input type="search" id="search" name="search">
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              {% for column in exercises[0]._asdict() %}
+              <th>{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for exercise in exercises %}{% set edict = exercise._asdict()%}
+            <tr>
+              <td><input type="checkbox" id={{ exercise.id }} name='exercises' value={{ exercise.id }}{% if exercise.id.__str__() in entity.exercise_ids %} checked{% endif %}></td>
+              {% for column in edict %}
+              <td>{{ edict[column]|tw }}</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
     </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
-  </form>
-
-  <hr>
-
+  </div>
+</div>
 {% endblock %}

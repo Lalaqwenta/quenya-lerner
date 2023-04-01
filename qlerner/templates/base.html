@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
 </head>
 <body>
     <header>
@@ -21,8 +21,8 @@
                     {% if current_user.role == "admin" %}
                     <h2>{{ gettext('Admin actions!') }}</h2>
                     {% for entity in [gettext('User'), gettext('Lesson'), gettext('Exercise'), gettext('Word')] %}
-                    <li><a href="{{ url_for(entity.lower() + '_routes.' + entity.lower() + 's') }}">{{ gettext('Manage') }} {{ entity }}s</a></li>
-                    <li><a href="{{ url_for(entity.lower() + '_routes.create_' + entity.lower()) }}">{{ gettext('Create') }} {{ entity }}</a></li>{% endfor %}
+                    <li><a href="{{ url_for(entity.lower() + '_routes.' + entity.lower() + 's') }}">{{ gettext('Manage') }} {{ entity }}s</a>
+                    <a href="{{ url_for(entity.lower() + '_routes.create_' + entity.lower()) }}">{{ gettext('Create') }} {{ entity }}</a></li>{% endfor %}
                     {% endif %}
                 {% else %}
                     <li><a href="{{ url_for('routes.signup') }}">{{ gettext('Sign up') }}</a></li>

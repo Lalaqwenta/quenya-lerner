@@ -6,16 +6,37 @@
       <div class="col-lg-6">
         <h2>Create {{ entity_name }}</h2>
         <form method="POST" action="{{ url_for(entity_name.lower() + '_routes.create_' + entity_name.lower()) }}">
-          {% for column in columns %}{% if column != 'id' %}<label for="{{ column }}">{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}:</label>
+          {% for column in columns %}{% if column not in ['id', 'exercise_ids'] %}<label for="{{ column }}">{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}:</label>
           <input type="text" id="{{ column }}" name="{{ column }}" required><br>{% endif %}{% endfor %}
           <label for="tags">Tags :</label>
           <input type="text" id="tags" name="tags" required><br>
-          {% if entity_name == 'Lesson' %}<select name="exercises" id="exercises" multiple>
-            <table class="table">{% for exercise in exercises %}{% set edict = exercise._asdict()%}
-              <tr><option value="{{ exercise.id }}">{% for column in edict %}<td>{{ edict[column]|tw }}</td>{% endfor %}</option></tr>
-            {% endfor %}</table>
-          </select><br>{% endif %}
-          <input type="submit" value="Create {{ entity_name }}">
+          {% if entity_name == 'Lesson' %}
+            <div>
+              <label for="search">Search:</label>
+              <input type="search" id="search" name="search">
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  {% for column in exercises[0]._asdict() %}
+                  <th>{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for exercise in exercises %}{% set edict = exercise._asdict()%}
+                <tr>
+                  <td><input type="checkbox" id={{ exercise.id }} name='exercises' value={{ exercise.id }}></td>
+                  {% for column in edict %}
+                  <td>{{ edict[column]|tw }}</td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% endif %}
+          <input type="submit" class="btn btn-primary" value="Create {{ entity_name }}">
         </form>
       </div>
     </div>
