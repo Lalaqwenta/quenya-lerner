@@ -55,6 +55,7 @@ def create_{{ entity_name|lower }}():
     search = request.args.get('search', '')
     sort_by = request.args.get('sort_by', 'id')
     sort_order = request.args.get('sort_order', 'asc')
+    required_data = [column.name for column in {{ entity_name }}.__table__.columns._all_columns if not column.nullable]
     # handle form submission
     if request.method == 'POST':
         {% for column in columns[1:] %}{% if column in ['exercise_ids']%}
@@ -62,7 +63,6 @@ def create_{{ entity_name|lower }}():
         {{ column }} = request.form['{{ column }}']{% endif %}{% endfor %}
         tags = request.form['tags']
         # validate form data
-        required_data = [column.name for column in {{ entity_name }}.__table__.columns._all_columns if not column.nullable]
         {% for column in columns[1:] %}if '{{ column }}' in required_data and not {{ column }}:
             flash(gettext('Please enter {{ column }}'), 
                 'danger')
@@ -76,7 +76,6 @@ def create_{{ entity_name|lower }}():
         db.session.commit()
 
         # create tags for the new {{ entity_name|lower }} if any
-        tags = request.form['tags']
         if tags:
             tags_list = tags.split(',')
             for tag in tags_list:
@@ -85,17 +84,17 @@ def create_{{ entity_name|lower }}():
                     new_tag = Tags(tag=tag)
                     db.session.add(new_tag)
                     db.session.commit()
-                    tag_id = new_tag.id
-                db.session.execute({{ entity_name|lower }}_tags.insert().values({{ entity_name|lower }}_id=new_{{ entity_name|lower }}.id, tag_id=tag_id))
+                    tag_id = new_tag
+                db.session.execute({{ entity_name|lower }}_tags.insert().values({{ entity_name|lower }}_id=new_{{ entity_name|lower }}.id, tag_id=tag_id.id))
             db.session.commit()
 
         flash(gettext('{{ entity_name }} created successfully'), 'success')
         return redirect(url_for('{{ entity_name|lower }}_routes.create_{{ entity_name|lower }}'))
 
     # render the {{ entity_name|lower }} creation form
-    return render_template('create_template.html', entity_name='{{ entity_name }}',
+    return render_template('create_template.html', required=required_data, entity_name='{{ entity_name }}',
         columns={{ columns }}{% if entity_name == 'Lesson' %}, exercises = search_exercises(search=search,
-         sort_by=sort_by, sort_order=sort_order ){% endif %})
+         sort_by=sort_by, sort_order=sort_order ), search=search, sort_by=sort_by, sort_order=sort_order{% endif %})
 
 # Page to edit some {{ entity_name|lower }}.
 @{{ entity_name|lower}}_routes.route('/{{ entity_name|lower}}/<int:id>/edit', methods=['GET', 'POST'])
@@ -144,15 +143,15 @@ def edit_{{ entity_name|lower}}(id):
 
     return render_template('edit_template.html', entity_name='{{ entity_name }}', columns={{ columns }},
                         entity={{ entity_name|lower}}{% if entity_name == 'Lesson' %}, exercises = search_exercises(search=search,
-                        sort_by=sort_by, sort_order=sort_order ){% endif %})
+                        sort_by=sort_by, sort_order=sort_order ), search=search, sort_by=sort_by, sort_order=sort_order{% endif %})
 
 # URL to delete {{ entity_name|lower }}.
 @{{ entity_name|lower}}_routes.route('/{{ entity_name|lower}}/<int:id>/delete', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def delete_{{ entity_name|lower}}(id):
-    {{ entity_name|lower}}_id = id
-    {{ entity_name }}.query.filter_by(id={{ entity_name|lower}}_id).delete()
+    {{ entity_name }}.query.filter_by(id=id).delete()
+    db.session.execute({{ entity_name|lower }}_tags.delete().filter_by({{ entity_name|lower }}_id=id))
     db.session.commit()
     return make_response(redirect(request.referrer))
 

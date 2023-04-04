@@ -16,30 +16,8 @@
           <input class="form-control" id="tags" name="tags" value="{{ entity['tags'] }}">
         </div>
         {% if entity_name == 'Lesson' %}
-        <div>
-          <label for="search">Search:</label>
-          <input type="search" id="search" name="search">
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              {% for column in exercises[0]._asdict() %}
-              <th>{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}</th>
-              {% endfor %}
-            </tr>
-          </thead>
-          <tbody>
-            {% for exercise in exercises %}{% set edict = exercise._asdict()%}
-            <tr>
-              <td><input type="checkbox" id={{ exercise.id }} name='exercises' value={{ exercise.id }}{% if exercise.id.__str__() in entity.exercise_ids %} checked{% endif %}></td>
-              {% for column in edict %}
-              <td>{{ edict[column]|tw }}</td>
-              {% endfor %}
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+          {% set main_route = url_for('lesson_routes.edit_lesson', id = entity.id) %}
+          {% include 'search_tags_subwindow.html' %}
         {% endif %}
         <button type="submit" class="btn btn-primary">Save</button>
       </form>

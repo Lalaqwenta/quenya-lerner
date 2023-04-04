@@ -1,0 +1,30 @@
+
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search exercises..." name="search" value="{{ search }}">
+        <div class="input-group-append">
+            <button onclick="event.preventDefault();" href="{{ main_route }}{{'?search=' + search if search }}{{ '?sort_by=' + sort_by if sort_by }}" class="btn btn-outline-secondary">Search</button>
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="sortDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Sort By {% if sort_by==None %}ID{% endif %}{% for c in sort_by.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}
+            </button>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+            <th></th>
+            {% for column in exercises[0]._asdict() %}
+            <th><a class="dropdown-item" href="{{ main_route }}{{ '?search=' + search if search }}?sort_by={{ column }}">{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}</a></th>
+            {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for exercise in exercises %}{% set edict = exercise._asdict()%}
+            <tr>
+            <td><input type="checkbox" id={{ exercise.id }} name='exercises' value={{ exercise.id }}{% if entity and exercise.id.__str__() in entity.exercise_ids %} checked{% endif %}></td>
+            {% for column in edict %}
+            <td>{{ edict[column]|tw }}</td>
+            {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
