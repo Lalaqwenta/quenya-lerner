@@ -25,6 +25,7 @@ REM Start the Flask server
 echo Starting Flask server...
 set FLASK_APP=qlerner
 set FLASK_ENV=development
+python jinja.py
 python -m flask init-db
 start http://localhost:5000
 python -m flask run --host=0.0.0.0 --port=5000
