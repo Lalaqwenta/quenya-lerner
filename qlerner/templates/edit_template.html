@@ -10,18 +10,49 @@
           <label for="{{ column }}">{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}:</label>
           <textarea class="form-control" id="{{ column }}" name="{{ column }}">{{ entity[column] if column not in ['password']}}</textarea>
         </div>{% endif %}{% endfor %}
-
+        <input type="hidden" name="exercises" id="exercises">
         <div class="form-group">
           <label for="tags">Tags (comma-separated)</label>
           <input class="form-control" id="tags" name="tags" value="{{ entity['tags'] }}">
         </div>
         {% if entity_name == 'Lesson' %}
           {% set main_route = url_for('lesson_routes.edit_lesson', id = entity.id) %}
-          {% include 'search_tags_subwindow.html' %}
+          <button onclick="openPopup()" class="btn btn-outline-secondary">Add exercises</button>
         {% endif %}
         <button type="submit" class="btn btn-primary">Save</button>
       </form>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    function openPopup() {
+      // prevent the main form from submitting
+      event.preventDefault();
+      
+      // open the popup window and load the included template
+      var popup = window.open("", "popup", "width=600,height=400");
+      popup.document.write(`{% include 'search_tags_subwindow.html' %}`);
+      
+      // add an event listener to the submit button in the popup window
+      popup.document.querySelector("#popup-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+    
+        // get the checked options from the popup window
+        var checkedExercises = Array.from(popup.document.querySelectorAll('input[name="exercises"]:checked')).map(function(checkbox) {
+          return checkbox.value;
+        });
+    
+        // close the popup window
+        popup.close();
+    
+        // set the value of the hidden input in the main form to the checked options
+        document.querySelector("#exercises").value = checkedExercises.join(",");
+      });
+
+      popup.document.querySelector("#popup-form").addEventListener("submit", popup.close)
+    }
+  </script>
 {% endblock %}

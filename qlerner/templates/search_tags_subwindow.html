@@ -1,4 +1,5 @@
-
+{% block popup %}
+<form id="popup-form">
     <div class="input-group">
         <input type="text" class="form-control" placeholder="Search exercises..." name="search" value="{{ search }}">
         <div class="input-group-append">
@@ -28,3 +29,6 @@
             {% endfor %}
         </tbody>
     </table>
+    <input type="submit" class="btn btn-primary" value="Submit">
+</form>
+{% endblock %}
