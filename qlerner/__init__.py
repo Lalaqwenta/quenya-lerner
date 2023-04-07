@@ -10,26 +10,30 @@ from qlerner.config import Config
 from qlerner.models.tengwarize import tengwarize
 from flask_babel import Babel
 
-app = Flask(__name__)
-app.register_blueprint(routes)
-app.register_blueprint(exercise_routes)
-app.register_blueprint(user_routes)
-app.register_blueprint(lesson_routes)
-app.register_blueprint(word_routes)
-app.config.from_object(Config)
-app.jinja_env.filters['tw'] = tengwarize
+application = Flask(__name__)
+application.register_blueprint(routes)
+application.register_blueprint(exercise_routes)
+application.register_blueprint(user_routes)
+application.register_blueprint(lesson_routes)
+application.register_blueprint(word_routes)
+application.config.from_object(Config)
+application.jinja_env.filters['tw'] = tengwarize
 
-app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
-app.config['LANGUAGES'] = {
+application.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
+application.config['LANGUAGES'] = {
     'en': 'English',
     'ru': 'Russian'
 }
 
-babel = Babel(app, default_locale='ru', default_timezone='GMT+3', locale_selector=locale_select)
+babel = Babel(application, default_locale='ru', default_timezone='GMT+3', locale_selector=locale_select)
 
-lm.init_app(app)
+lm.init_app(application)
 lm.login_view = 'login'
-init_app(app)
+init_app(application)
+
+@application.route("/")
+def hello():
+   return "<h1 style='color:blue'>Hello There!</h1>"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    application.run(host='0.0.0.0')
