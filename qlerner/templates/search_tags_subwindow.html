@@ -1,34 +1,75 @@
-{% block popup %}
-<form id="popup-form">
-    <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search exercises..." name="search" value="{{ search }}">
-        <div class="input-group-append">
-            <button onclick="event.preventDefault();" href="{{ main_route }}{{'?search=' + search if search }}{{ '?sort_by=' + sort_by if sort_by }}" class="btn btn-outline-secondary">Search</button>
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="sortDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Sort By {% if sort_by==None %}ID{% endif %}{% for c in sort_by.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}
-            </button>
+{% block scripts %}
+  <script>
+    // Add event listener to button 1
+    document.querySelector('#search').addEventListener('click', function(event) {
+      event.preventDefault(); // prevent form from being submitted
+      // Do something else, like redirect to the same URL with search query
+      //window.location.href = window.location.pathname + '{{'?search=' + search if search }}{{ '?sort_by=' + sort_by if sort_by }}';
+    });
+
+    // Add event listener to button 2
+    document.querySelector('#sort_by').addEventListener('click', function(event) {
+      event.preventDefault(); // prevent form from being submitted
+      // Do something else, like display an alert message
+      console.log("Sort by pressed")
+    });
+    
+    function openPopup() {
+      // prevent the main form from submitting
+      event.preventDefault();
+      
+      // open the popup window and load the included template
+      var popup = window.open("", "popup", "width=600,height=400");
+      popup.document.write(`<form id="popup-form">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search exercises..." name="search" value="{{ search }}">
+            <div class="input-group-append">
+                <button id='search' class="btn btn-outline-secondary">Search</button>
+                <button id='sort_by' class="btn btn-secondary dropdown-toggle" type="button" id="sortDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Sort By {% if sort_by==None %}ID{% endif %}{% for c in sort_by.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}
+                </button>
+            </div>
         </div>
-    </div>
-    <table>
-        <thead>
-            <tr>
-            <th></th>
-            {% for column in exercises[0]._asdict() %}
-            <th><a class="dropdown-item" href="{{ main_route }}{{ '?search=' + search if search }}?sort_by={{ column }}">{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}</a></th>
-            {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for exercise in exercises %}{% set edict = exercise._asdict()%}
-            <tr>
-            <td><input type="checkbox" id={{ exercise.id }} name='exercises' value={{ exercise.id }}{% if entity and exercise.id.__str__() in entity.exercise_ids %} checked{% endif %}></td>
-            {% for column in edict %}
-            <td>{{ edict[column]|tw }}</td>
-            {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <input type="submit" class="btn btn-primary" value="Submit">
-</form>
+        <table>
+            <thead>
+                <tr>
+                <th></th>
+                {% for column in exercises[0]._asdict() %}
+                <th><a id='{{ column }}' class="dropdown-item" href="{{ main_route }}{{ '?search=' + search if search }}?sort_by={{ column }}">{% for c in column.split('_') %}{{ c[0].upper() }}{{ c[1:].lower()}} {% endfor %}</a></th>
+                {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for exercise in exercises %}{% set edict = exercise._asdict()%}
+                <tr>
+                <td><input type="checkbox" id={{ exercise.id }} name='exercises' value={{ exercise.id }}{% if entity and exercise.id.__str__() in entity.exercise_ids %} checked{% endif %}></td>
+                {% for column in edict %}
+                <td>{{ edict[column]|tw }}</td>
+                {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" class="btn btn-primary" value="Submit">
+    </form>`);
+      
+      // add an event listener to the submit button in the popup window
+      popup.document.querySelector("#popup-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+    
+        // get the checked options from the popup window
+        var checkedExercises = Array.from(popup.document.querySelectorAll('input[name="exercises"]:checked')).map(function(checkbox) {
+          return checkbox.value;
+        });
+    
+        // close the popup window
+        popup.close();
+    
+        // set the value of the hidden input in the main form to the checked options
+        document.querySelector("#exercises").value = checkedExercises.join(",");
+      });
+
+      popup.document.querySelector("#popup-form").addEventListener("submit", popup.close)
+    }
+  </script>
 {% endblock %}
